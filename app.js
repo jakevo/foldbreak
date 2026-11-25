@@ -266,16 +266,43 @@ const triggerFooter = () => ({
   secondUnfold: 'The first opening is fine. It breaks the next time.',
 }[prefs.trigger]);
 
+/** How to get the full-screen version: it only exists as a Home Screen icon added from Safari. */
+function installCard() {
+  // ?ua=... previews another browser (testing only)
+  const ua = new URLSearchParams(location.search).get('ua') || navigator.userAgent;
+  const iOS = /iPhone|iPad|iPod/.test(ua) || (!/Android/.test(ua) && navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const inApp = /FBAN|FBAV|Instagram|Line\/|Snapchat|TikTok|musical_ly|Twitter|GSA\/|LinkedInApp|Messenger/.test(ua);
+  const otherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS|DuckDuckGo/.test(ua);
+  const link = location.origin + location.pathname;
+  if (!iOS) {
+    return `<div class="group"><div class="cell card install">
+      <b>Open this on your iPhone</b>
+      <p>FoldBreak is made for a phone. Open <b>${esc(link)}</b> in Safari on your iPhone, then follow the steps there.</p></div></div>`;
+  }
+  const notSafari = inApp || otherBrowser;
+  return `<div class="group"><div class="cell card install">
+    <b>First, add FoldBreak to your Home Screen</b>
+    <p class="sub">The prank only works full screen. In a browser, the address bar gives it away.</p>
+    ${notSafari ? `<div class="warn"><b>Open this page in Safari first.</b> You're in ${inApp ? 'an app\'s built-in browser' : 'another browser'}.
+      Copy the link, open Safari, and paste it in the address bar.
+      <button class="copy" id="copylink">Copy link</button></div>` : ''}
+    <ol>
+      <li>In Safari, tap the <b>Share</b> button <span class="sym">${SHARE_ICON}</span> at the bottom of the screen. If you don't see it, tap <b>•••</b> first.</li>
+      <li>Scroll down and tap <b>Add to Home Screen</b>.</li>
+      <li>Make sure <b>Open as Web App</b> is switched on, then tap <b>Add</b>.</li>
+      <li>Close Safari and open <b>FoldBreak</b> from your Home Screen. This message disappears there.</li>
+    </ol></div></div>`;
+}
+
+const SHARE_ICON = '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg>';
+
 function renderSetup() {
   const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
   const el = document.createElement('div');
   el.className = 'setup';
   el.innerHTML = `
     <h1>FoldBreak</h1>
-    ${!standalone ? `<div class="group"><div class="cell card">
-      <b>Add FoldBreak to your Home Screen</b>
-      <p>For the full-screen prank, tap <b>Share</b> <span class="share">⎋</span> then <b>Add to Home Screen</b>, and open FoldBreak from there. In Safari, the address bar gives the prank away.</p>
-    </div></div>` : ''}
+    ${!standalone ? installCard() : ''}
     ${!prefs.seenGuide ? `<div class="group"><div class="cell card guide">
       <b>How it works</b>
       <p>🎚️ Pick how the screen breaks below.</p>
@@ -333,6 +360,12 @@ function renderSetup() {
     try { await saveImage(inp.dataset.photo, f); } catch { alert('Couldn\'t use that image.'); }
     rerenderSetup();
   }));
+  const copy = el.querySelector('#copylink');
+  if (copy) copy.addEventListener('click', async () => {
+    const link = location.origin + location.pathname;
+    try { await navigator.clipboard.writeText(link); copy.textContent = 'Copied ✓'; }
+    catch { prompt('Copy this link, then paste it in Safari:', link); }
+  });
   const got = el.querySelector('#gotit');
   if (got) got.addEventListener('click', () => { prefs.seenGuide = true; rerenderSetup(); });
   el.querySelector('#start').addEventListener('click', startPrank);

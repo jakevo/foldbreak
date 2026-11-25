@@ -34,7 +34,12 @@ body.prank { background: #000; overflow: hidden; position: fixed; inset: 0; touc
 .ftr.center { text-align: center; margin-top: 18px; }
 .card { display: grid; gap: 10px; padding: 16px; }
 .card p { margin: 0; font-size: 15px; }
-.card .share { display: inline-block; transform: rotate(-90deg); }
+.install { border: 2px solid var(--tint); border-radius: 12px; }
+.install .sub { color: var(--sub); font-size: 14px; }
+.install ol { margin: 2px 0 0; padding-left: 22px; display: grid; gap: 8px; font-size: 15px; }
+.install .sym { display: inline-grid; place-items: center; vertical-align: -3px; color: var(--tint); }
+.install .warn { background: rgba(255,149,0,.14); border-radius: 10px; padding: 10px 12px; font-size: 14px; display: grid; gap: 8px; }
+.install .copy { justify-self: start; border: 0; border-radius: 8px; background: var(--tint); color: #fff; font: 600 14px var(--sys); padding: 7px 14px; }
 .link { color: var(--tint); background: none; border: 0; font: inherit; padding: 0; text-align: left; font-weight: 600; }
 .seg { display: flex; width: 100%; background: rgba(118,118,128,.14); border-radius: 9px; padding: 2px; }
 .seg button { flex: 1; border: 0; background: none; color: inherit; font: 600 13px var(--sys); padding: 7px 4px; border-radius: 7px; }
